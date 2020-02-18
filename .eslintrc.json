@@ -1,0 +1,50 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["eslint:recommended", "airbnb"],
+  "env": {
+    "node": true,
+    "browser": false,
+    "es6": true
+  },
+  "plugins": [
+    "babel",
+    "import",
+    "filenames"
+  ],
+
+  "rules": {
+    "max-len": ["error", 120],
+    "comma-dangle": ["error", "never"],
+    "no-console": ["error", {
+      "allow": ["warn", "error"]
+    }],
+    "no-multiple-empty-lines": ["error", {
+      "max": 1,
+      "maxBOF": 0,
+      "maxEOF": 0
+    }],
+    "object-curly-newline": ["error", {
+      "ImportDeclaration": {
+        "multiline": true,
+        "minProperties": 14
+      },
+      "ExportDeclaration": {
+        "multiline": true,
+        "minProperties": 7
+      }
+    }],
+    "no-use-before-define": ["error", {
+      "functions": true,
+      "classes": true,
+      "variables": true
+    }],
+    "class-methods-use-this": "off",
+    "babel/new-cap": "error",
+    "babel/semi": "error",
+    "babel/no-unused-expressions": "error",
+    "babel/valid-typeof": "error",
+    "import/prefer-default-export": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "filenames/match-regex": ["error", "^([a-zA-Z][a-z0-9]+)+(\\.[a-zA-Z0-9]{3,50}){0,3}$"]
+  }
+}
