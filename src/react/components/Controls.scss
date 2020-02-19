@@ -1,0 +1,11 @@
+.controls {
+  height: 50px;
+  width: 100%;
+  display: flex;
+
+  .controlButton {
+    border-radius: 0;
+    height: 50px;
+    flex: 1;
+  }
+}
