@@ -1,21 +1,19 @@
-import { isNil } from 'lodash';
 import {
   USERS_DATA_SET,
   WEB_WORKER_SET,
+  SET_MAP_REFERENCE,
   UNIQUE_USER_ID_SET,
-  USER_OBSERVED_CHANGE,
+  NEW_USER_OBSERVED_SET,
   CURRENT_USER_POSITION_SET,
   LOCATION_MONITORING_TOGGLE
 } from '../actions/locationDetectionActions';
 
 
-
-const DEFAULT_OBSERVED_USER_ID = 1;
-
 const initialState = {
+  mapRef: null,
   webWorker: null,
   uniqueUserId: null,
-  observedUserIndex: DEFAULT_OBSERVED_USER_ID,
+  observedUserIndex: null,
   currentUserPosition: null,
   isLocationMonitoring: false,
   usersLocations: []
@@ -33,6 +31,12 @@ export const locationMonitoringReducer = (state = initialState, action) => {
       return {
         ...state,
         usersLocations: action.payload
+      };
+      
+      case SET_MAP_REFERENCE:
+      return {
+        ...state,
+        mapRef: action.payload
       };
 
     case UNIQUE_USER_ID_SET:
@@ -53,14 +57,10 @@ export const locationMonitoringReducer = (state = initialState, action) => {
           currentUserPosition: action.payload
         };
 
-    case USER_OBSERVED_CHANGE:
-      const observedUserIndex = !isNil(state.usersLocations[state.observedUserIndex + 1])
-      ? state.usersLocations.indexOf(state.usersLocations[state.observedUserIndex + 1])
-      : -1;
-
+    case NEW_USER_OBSERVED_SET:
       return {
         ...state,
-        observedUserIndex
+        observedUserIndex: action.payload
       };
 
     default:

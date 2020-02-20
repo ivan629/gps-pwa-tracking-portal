@@ -6,13 +6,3 @@ export const getMarkers = createSelector(
     ],
     (usersLocations) => usersLocations
 );
-
-export const getObservedUserLocation = createSelector(
-    [
-        state => state.locationMonitoring.observedUserIndex,
-        state => getMarkers(state)
-    ],
-    (observedUserIndex, allUserLocations) => {
-        return observedUserIndex > 0 ? null : allUserLocations[observedUserIndex];
-    }
-);

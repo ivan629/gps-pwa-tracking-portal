@@ -1,26 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
+import { useDispatch } from 'react-redux';
+import { toggleLocationMonitoring, switchObservedUser } from '../../redux/actions/locationDetectionActions'
 
-import { firebaseService } from '../../redux/services/firebaseService';
+import { locationDetectionService } from '../../redux/services/locationDetectionService';
 
 import './Controls.scss'
 
 
-function Controls({ toggleLocationMonitor, isLocationMonitoring, changeObservedUser }) {
+function Controls({ isLocationMonitoring }) {
+    const dispatch = useDispatch();
+
     useEffect(() => {
-        return () => firebaseService.clearCurrentUserPositionHistory()
-    }, []);
+            const isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+
+            if (isMobile) {
+                document.addEventListener('visibilitychange', async () => {
+                    if (document.visibilityState === 'hidden') {
+                        await dispatch(toggleLocationMonitoring(false));
+                    }
+                });
+            } else {
+                window.addEventListener("beforeunload", () => locationDetectionService.stopLocationDetection())
+            }
+        }
+    , []);
 
     return (
         <div className="controls">
-            <Button className="controlButton toggleDetectionbutton"
+            <Button className="controlButton toggleDetectionButton"
                 variant="outlined"
-                onClick={() => toggleLocationMonitor(!isLocationMonitoring)}>
-                {`${isLocationMonitoring ? 'stop' : 'start'} detetion`}
+                onClick={() => dispatch(toggleLocationMonitoring(!isLocationMonitoring))}>
+                {`${isLocationMonitoring ? 'stop' : 'start'} detection`}
             </Button>
             <Button className="controlButton switchFocusButton" variant="outlined"
-            onClick={() => changeObservedUser()}>
-            switch focus
+                onClick={() => dispatch(switchObservedUser())}>
+                switch focus
             </Button>
         </div>
     )

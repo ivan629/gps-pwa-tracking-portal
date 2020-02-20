@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Compare correct button text renders properly 1`] = `
+"<div className=\\"controls\\">
+  <WithStyles(ForwardRef(Button)) className=\\"controlButton toggleDetectionButton\\" variant=\\"outlined\\" onClick={[Function: onClick]}>
+    start detection
+  </WithStyles(ForwardRef(Button))>
+  <WithStyles(ForwardRef(Button)) className=\\"controlButton switchFocusButton\\" variant=\\"outlined\\" onClick={[Function: onClick]}>
+    switch focus 1
+  </WithStyles(ForwardRef(Button))>
+</div>"
+`;

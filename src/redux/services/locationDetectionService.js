@@ -1,33 +1,84 @@
 import { isNil } from 'lodash';
 import React from 'react';
+import geolocator from 'geolocator';
 
 import store from '../store';
 
-import { firebaseService } from './firebaseService'
-import worker from 'workerize-loader!../../redux/workers/worker.js'; // eslint-disable-line import/no-webpack-loader-syntax
+import { firebaseService } from './firebaseService';
 
-import { CURRENT_USER_POSITION_SET } from '../actions/locationDetectionActions';
+const POSITION_DETECTION_TIMEOUT = 2000;
 
 
 class LocationDetectionService {
     constructor() {
-        this.workerInstance = worker();
-        this.updatePosition = (position) => store.dispatch({ type: CURRENT_USER_POSITION_SET, payload: position })
+        this.options = {
+            enableHighAccuracy: true,
+            desiredAccuracy: 30,
+            timeout: 5000,
+            maximumWait: 60000,
+            maximumAge: 0,
+            fallbackToIP: true,
+            addressLookup: true,
+            timezone: true
+        };
+
+        this.allUsersDetectionTimeoutId = null;
+        this.currentUserDetectionTimeoutId = null;
+
+        geolocator.config({
+            language: "en",
+            google: {
+                version: "3",
+                key: "AIzaSyAWQ8iRopFMgVSsyQxxKrnrGxh3YGGR3Qs"
+            }
+        });
+    }
+
+    get isLocationMonitoring() {
+        return store.getState().locationMonitoring.isLocationMonitoring;
     }
 
     startLocationDetection() {
-        this.workerInstance.addEventListener('message', async ({ data }) => {
-            if (!isNil(data.lat) && !isNil(data.lon)) {
-                await firebaseService.handlePositionSet({ lat: data.lat, lon: data.lon });
+        this.detectUserLocation();
+        this.detectAllUsersLocationDetection();
+    }
+
+    detectAllUsersLocationDetection() {
+        if(!this.isLocationMonitoring) {
+            return;
+        }
+
+        this.allUsersDetectionTimeoutId = setTimeout(async () => {
+            await firebaseService.setAllUsersData();
+            this.detectAllUsersLocationDetection()
+        }, POSITION_DETECTION_TIMEOUT);
+    }
+
+    detectUserLocation() {
+        if(!this.isLocationMonitoring) {
+            return;
+        }
+
+        geolocator.locate(this.options, async (err, location) => {
+            const { latitude: lat, longitude: lon } = location.coords;
+
+            await firebaseService.handlePositionSet({ lat, lon });
+            this.currentUserDetectionTimeoutId = setTimeout(
+                () => this.detectUserLocation(),
+                POSITION_DETECTION_TIMEOUT
+            );
+
+            if(!isNil(err)) {
+                console.log(err);
             }
         });
-
-        this.workerInstance.startDetection();
     }
 
     async stopLocationDetection() {
-        this.workerInstance.stopDetection();
+        clearTimeout(this.allUsersDetectionTimeoutId);
+        clearTimeout(this.currentUserDetectionTimeoutId);
+        await firebaseService.clearCurrentUserPositionHistory();
     }
 }
 
-export default LocationDetectionService;
+export const locationDetectionService = new LocationDetectionService();

@@ -1,11 +1,23 @@
 import React from 'react';
-import { render } from '@testing-library/react';
-import App from './App';
+import { shallow } from 'enzyme';
+import Controls from './react/components/Controls';
 
-/* eslint-disable */
+describe('Compare correct button text', () => {
+  const nextProps = {
+    isLocationMonitoring: false
+  };
 
-test('renders learn react link', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const wrapper = shallow(<Controls {...nextProps}/>);
+
+  // it('is correct button text', () => {
+  //   const text = wrapper.find('.toggleDetectionButton').text();
+  //
+  //   console.log(text);
+  //
+  //   expect(text).toEqual(`${nextProps.isLocationMonitoring ? 'stop' : 'start'} detection`);
+  // });
+
+  it('renders properly', () => {
+    expect(wrapper.debug()).toMatchSnapshot()
+  })
 });
